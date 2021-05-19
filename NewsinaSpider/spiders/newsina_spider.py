@@ -50,7 +50,7 @@ class NewsinaSpiderSpider(RedisSpider):
             item['uu_id']=self.task_id
             ctime = datetime.fromtimestamp(int(data.get('ctime')))
             ctime = datetime.strftime(ctime, '%Y-%m-%d %H:%M')
-            item['dataType']='3'
+            item['dataType']=3
             item['ctime'] = ctime
             item['url'] = data.get('url')
             try:
