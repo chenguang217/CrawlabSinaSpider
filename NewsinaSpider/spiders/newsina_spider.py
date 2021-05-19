@@ -13,6 +13,7 @@ from scrapy.utils.project import get_project_settings
 class NewsinaSpiderSpider(RedisSpider):
     name = 'newsina_spider'
     redis_key = 'spider:start_urls'
+
     
     def __init__(self, page_num=10,lid=2509,node='master',task_id='111', *args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -42,12 +43,14 @@ class NewsinaSpiderSpider(RedisSpider):
     def parse(self, response):
         result = json.loads(response.text)
         data_list = result.get('result').get('data')
+        
         for data in data_list:
             item = NewsinaspiderItem()
-
+            item['task_id']=self.task_id
+            item['uu_id']=self.task_id
             ctime = datetime.fromtimestamp(int(data.get('ctime')))
             ctime = datetime.strftime(ctime, '%Y-%m-%d %H:%M')
-            item['dataType']=3
+            item['dataType']='3'
             item['ctime'] = ctime
             item['url'] = data.get('url')
             try:
