@@ -69,12 +69,12 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {
-    'crawlab.pipelines.CrawlabMongoPipeline': 888,
-}
 # ITEM_PIPELINES = {
-#     'NewsinaSpider.pipelines.MongoPipeline': 302,
+#     'crawlab.pipelines.CrawlabMongoPipeline': 888,
 # }
+ITEM_PIPELINES = {
+    'NewsinaSpider.pipelines.MongoPipeline': 302,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

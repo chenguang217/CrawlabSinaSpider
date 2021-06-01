@@ -9,20 +9,23 @@ import redis
 from datetime import datetime
 from scrapy_redis.spiders import RedisSpider
 from scrapy.utils.project import get_project_settings
+import os
+from urllib.request import urlretrieve
 
 class NewsinaSpiderSpider(RedisSpider):
     name = 'newsina_spider'
     redis_key = 'spider:start_urls'
 
     
-    def __init__(self, page_num=10,lid=2509,node='master',task_id='111', *args,**kwargs):
+    def __init__(self, page_num=10,lid=2509,node='master',uu_id='111', *args,**kwargs):
         super().__init__(*args,**kwargs)
         self.page_num=int(page_num)
         self.lid=str(lid)
-        self.task_id=task_id
-        self.redis_key=self.redis_key+task_id
-        base_url = 'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid={}&k=&num=50&page={}&r={}'
+        self.task_id=uu_id
+        self.redis_key=self.redis_key+uu_id
+
         if node=='master':
+            base_url = 'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid={}&k=&num=50&page={}&r={}'
             settings = get_project_settings()
             r = redis.Redis(host=settings.get("REDIS_HOST"), port=settings.get("REDIS_PORT"), decode_responses=True)
             for page in range(1, self.page_num+1):
@@ -43,9 +46,14 @@ class NewsinaSpiderSpider(RedisSpider):
     def parse(self, response):
         result = json.loads(response.text)
         data_list = result.get('result').get('data')
-        
+
+
+
+
         for data in data_list:
             item = NewsinaspiderItem()
+
+
             item['task_id']=self.task_id
             item['uu_id']=self.task_id
             ctime = datetime.fromtimestamp(int(data.get('ctime')))
@@ -53,13 +61,47 @@ class NewsinaSpiderSpider(RedisSpider):
             item['dataType']=3
             item['ctime'] = ctime
             item['url'] = data.get('url')
-            try:
-                item['img'] = data.get('img')
-            except:
-                continue
+            # try:
+            #     item['img'] = data.get('img')
+            # except:
+            #     continue
             item['title'] = data.get('title')
             item['media_name'] = data.get('media_name')
             item['keywords'] = data.get('keywords')
+
+            #下载图片
+            pic_list=[]
+            i=0
+            for u in data.get('images'):
+                i=i+1
+                pic_url=u['u']
+                if not os.path.exists('/data/' + self.task_id + '/img/'):
+                    os.makedirs('/data/' + self.task_id + '/img/')
+                pic_path='/data/' + self.task_id + '/img/' + '_' + str(i) + '.jpg'
+                urlretrieve(pic_url, pic_path)
+                pic_list.append(pic_path)
+            item['pics']=pic_list
+            # i=0
+            # image_list_pattern=re.compile(r'(\"images\"\:)(\[.+?\])')
+            # image_url_pattern=re.compile(r"(\"u\"\:)(.*?\.((jpg)|(gif)|(png)))")
+            # pic_pa=[]
+            # for image_list_str in re.findall(image_list_pattern,data.text):
+            #     image_url_list=re.findall(image_url_pattern,str(image_list_str))
+            #     for image_url in image_url_list:
+            #         # print(image_url[1]
+            #         i=i+1
+            #         img=str(image_url[1])
+            #         img=re.sub(r'\\','',img)
+            #         img=re.sub(r'"','',img)
+
+            #         print(img)
+            #         if not os.path.exists('/data/' + self.task_id + '/img/'):
+            #             os.makedirs('/data/' + self.task_id + '/img/')
+            #         pic_path='/data/' + self.task_id + '/img/' + '_' + str(i) + '.jpg'
+            #         urlretrieve(img, pic_path)
+            #         pic_pa.append(pic_path)
+            #     item['pics']=pic_pa
+            # pic_pa=[]
             yield Request(url=item['url'], callback=self.parse_content, meta={'item': item})
 
     # 进入到详情页面 爬取新闻内容

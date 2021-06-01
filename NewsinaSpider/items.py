@@ -16,9 +16,11 @@ class NewsinaspiderItem(scrapy.Item):
     collection = 'newsina'
 #和字典很相似，类似于字典的字段
     dataType = Field()
+    task_id=Field()
+    uu_id=Field()
     ctime = Field()  # 发布时间
     url = Field()
-    img = Field()
+    pics = Field()
     title = Field()  # 新闻标题
     media_name = Field()  # 发发布的媒体
     keywords = Field()  #  关键词
