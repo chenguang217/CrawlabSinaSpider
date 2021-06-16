@@ -9,6 +9,18 @@
         "necessary":true,
         "description":"www.sina.com"
     },
+    "node": {
+        "type": "string",
+        "necessary": true,
+        "description": "爬虫类型",
+        "candidates": ["master","slave"]
+    },
+    "crawl_image": {
+        "type": "boolean",
+        "necessary": true,
+        "description": "是否爬取图片",
+        "candidates": ["True","False"]
+    },
     "website_type":{
         "type":"string",
         "necessary":true,
