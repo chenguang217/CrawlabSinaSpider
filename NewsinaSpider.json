@@ -1,6 +1,6 @@
 {
     "lid":{
-        "type":"int",
+        "type":"string",
         "necessary":true,
         "description":"新闻类型"
     },
@@ -16,7 +16,7 @@
         "candidates": ["master","slave"]
     },
     "crawl_image": {
-        "type": "boolean",
+        "type": "select",
         "necessary": true,
         "description": "是否爬取图片",
         "candidates": ["True","False"]
